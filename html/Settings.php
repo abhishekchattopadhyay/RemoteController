@@ -54,6 +54,7 @@ $sec = "600";
 	    flex: 3;
 	    background-color: #f1f1f1;
 	    padding: 10px;
+	    outline: 1px dotted green; 
 	}
 
 	/* Style the footer */
@@ -71,7 +72,7 @@ $sec = "600";
 	    padding: 5px;
 	}
 	th {
-	    text-align: left;
+	    text-align: justify;
 	}
 
 	/* Responsive layout - makes the menu and the content (inside the section) sit on top of each other instead of next to each other */
@@ -124,6 +125,7 @@ $sec = "600";
   
   <article>
     <h1>Settings</h1>
+      <article>
 	<h2>Switch Configuration</h2>
 	<?php
 	$host    = "localhost";
@@ -196,11 +198,23 @@ $sec = "600";
 	?>
 	</table>
 
+      </article>
+
+      <article>
+	<h2>Power Cycler date and time</h2>
+	<form>
+		<input type="date" name="pday" min="2000-01-02">
+		<input type="time" name="pday">
+		<input type="submit">
+	</form>
+      </article>
+
+      <article>
 	<h2>Network Selection</h2>
 	<form action="/action_page.php">
 	  <select name="network" id="network">
-		<option value="DHCP">"automatic"</option>
-		<option value="MANUAL">"manual"</option>
+		<option value="DHCP">automatic</option>
+		<option value="MANUAL">manual</option>
 	  </select>
 
 	<div id="otherType" style="display:none;">
@@ -215,7 +229,7 @@ $sec = "600";
 		<br></br>
 	</div>
 	<script type="text/javascript"
-		src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+		src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script> 
 	$('#network').on('change',function(){
 		if( $(this).val()==="MANUAL"){
@@ -226,17 +240,66 @@ $sec = "600";
 		}
 	});
 	</script>
-	  <input type="submit">
-	</form>
-
-	<h2>Power Cycler date and time</h2>
-	<form>
-	<input type="date" name="pday" min="2000-01-02">
-	<input type="time" name="pday">
 	<input type="submit">
 	</form>
 
-	<h2>Black List IP Addresses</h2>
+      </article>
+
+      <article>
+	<h2>Screening Type</h2>
+	<form action="/action.php">
+	  <select name="Screening" id="Screening">
+		<option value="SELECT">SELECT</option>
+		<option value="WHITELIST">WHITELIST</option>
+		<option value="BLACKLIST">BLACKLIST</option>
+	  </select>
+	  <div id="WHITELIST" style="display:none;">
+		<?php
+		$host    = "localhost";
+		$user    = "root";
+		$pass    = "raspberry";
+		$db_name = "powercycler";
+
+		//create connection
+		$connection = mysqli_connect($host, $user, $pass, $db_name);
+
+		//test if connection failed
+		if(mysqli_connect_errno()){
+		    die("connection failed: "
+			. mysqli_connect_error()
+			. " (" . mysqli_connect_errno()
+			. ")");
+		}
+
+		//get results from database
+		$result = mysqli_query($connection,"SELECT IP FROM WhiteList");
+		$all_property = array();  //declare an array for saving property
+
+		//showing property
+		echo '<table class="data-table">
+			<tr class="data-heading">';  
+		while ($property = mysqli_fetch_field($result)) {
+		    echo '<td>' . $property->name . '</td>';  //get field name for header
+		    echo '<td>' . "action" . '</td>';
+		    array_push($all_property, $property->name);  //save those to array
+		}
+		echo '</tr>'; //end tr tag
+
+		//showing all data
+		while ($row = mysqli_fetch_array($result)) {
+		    echo "<tr>";
+		    foreach ($all_property as $item) {
+			echo '<td>' . $row[$item] . '</td>'; //get items using property value
+		    }
+		    echo '<td>' . '<input type="submit">' . '</td>';
+		    echo '</tr>';
+		}
+		echo "</table>";
+		?>
+
+	  </div>
+
+	  <div id="BLACKLIST" style="display:none;">
 		<?php
 		$host    = "localhost";
 		$user    = "root";
@@ -280,128 +343,125 @@ $sec = "600";
 		echo "</table>";
 
 		?>
-	<form>
-
-		<input type="text" name="blist" value="new blackList IP">
-		<input type="submit">
+		
+	  </div>
+  	  <script type="text/javascript"
+		src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	  <script> 
+	  $('#Screening').on('change',function(){
+		if( $(this).val()==="WHITELIST"){
+			$("#WHITELIST").show()
+			$("#BLACKLIST").hide()
+		}
+		else if( $(this).val()==="BLACKLIST"){
+			$("#BLACKLIST").show()
+			$("#WHITELIST").hide()
+		}
+		else{
+			$("#BLACKLIST").hide()
+			$("#WHITELIST").hide()
+		}
+	  });
+	  </script>
 	</form>
+      </article>
 
-	<h2>White List IP Addresses</h2>
-		<?php
-		$host    = "localhost";
-		$user    = "root";
-		$pass    = "raspberry";
-		$db_name = "powercycler";
+      <article>
+	<h2>Operating Mode</h2>
+	<form action="/action.php">
+		<select name="OperationMode" id="OperationMode">
+			<option value="SELECT">SELECT</option>
+			<option value="MASTER">MASTER</option>
+			<option value="SLAVE">SLAVE</option>
+		</select>
+		<div id="SLAVE" style="display:none;">
+			<?php
+			$host    = "localhost";
+			$user    = "root";
+			$pass    = "raspberry";
+			$db_name = "powercycler";
 
-		//create connection
-		$connection = mysqli_connect($host, $user, $pass, $db_name);
+			//create connection
+			$connection = mysqli_connect($host, $user, $pass, $db_name);
 
-		//test if connection failed
-		if(mysqli_connect_errno()){
-		    die("connection failed: "
-			. mysqli_connect_error()
-			. " (" . mysqli_connect_errno()
-			. ")");
-		}
+			//test if connection failed
+			if(mysqli_connect_errno()){
+			    die("connection failed: "
+				. mysqli_connect_error()
+				. " (" . mysqli_connect_errno()
+				. ")");
+			}
 
-		//get results from database
-		$result = mysqli_query($connection,"SELECT IP FROM WhiteList");
-		$all_property = array();  //declare an array for saving property
+			//get results from database
+			$result = mysqli_query($connection,"SELECT Slaves FROM General");
+			$all_property = array();  //declare an array for saving property
 
-		//showing property
-		echo '<table class="data-table">
-			<tr class="data-heading">';  
-		while ($property = mysqli_fetch_field($result)) {
-		    echo '<td>' . $property->name . '</td>';  //get field name for header
-		    echo '<td>' . "action" . '</td>';
-		    array_push($all_property, $property->name);  //save those to array
-		}
-		echo '</tr>'; //end tr tag
+			//showing property
+			echo '<table class="data-table">
+				<tr class="data-heading">';  
+			while ($property = mysqli_fetch_field($result)) {
+			    echo '<td>' . $property->name . '</td>';  //get field name for header
+			    echo '<td>' . "action" . '</td>';
+			    array_push($all_property, $property->name);  //save those to array
+			}
+			echo '</tr>'; //end tr tag
 
-		//showing all data
-		while ($row = mysqli_fetch_array($result)) {
-		    echo "<tr>";
-		    foreach ($all_property as $item) {
-			echo '<td>' . $row[$item] . '</td>'; //get items using property value
-		    }
-		    echo '<td>' . '<input type="submit">' . '</td>';
-		    echo '</tr>';
-		}
-		echo "</table>";
+			//showing all data
+			while ($row = mysqli_fetch_array($result)) {
+			    echo "<tr>";
+			    foreach ($all_property as $item) {
+				echo '<td>' . $row[$item] . '</td>'; //get items using property value
+			    }
+			    echo '<td>' . '<input type="submit">' . '</td>';
+			    echo '</tr>';
+			}
+			echo "</table>";
 
-		?>
-	<form>
+			?>
+		</div>
+		
+		<div id="MASTER" style="display:none;">
+			<h2>Add Master</h2>
+			<input type="text" name="wlist" >
+		</div>
 
-		<input type="text" name="wlist" value="new white List IP">
-		<input type="submit">
-	</form>
+  	  	<script type="text/javascript"
+			src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	  	<script> 
+		$('#OperationMode').on('change',function(){
+			if( $(this).val()==="MASTER"){
+				$("#MASTER").show()
+				$("#SLAVE").hide()
+			}
+			else if( $(this).val()=="SLAVE"){
+				$("#MASTER").hide()
+				$("#SLAVE").show()
+			}
+			else{
+				$("#MASTER").hide()
+				$("#SLAVE").hide()
+			}
+		});
+		</script>
 
-	<h2>Add Satellites</h2>
-		<?php
-		$host    = "localhost";
-		$user    = "root";
-		$pass    = "raspberry";
-		$db_name = "powercycler";
-
-		//create connection
-		$connection = mysqli_connect($host, $user, $pass, $db_name);
-
-		//test if connection failed
-		if(mysqli_connect_errno()){
-		    die("connection failed: "
-			. mysqli_connect_error()
-			. " (" . mysqli_connect_errno()
-			. ")");
-		}
-
-		//get results from database
-		$result = mysqli_query($connection,"SELECT Slaves FROM General");
-		$all_property = array();  //declare an array for saving property
-
-		//showing property
-		echo '<table class="data-table">
-			<tr class="data-heading">';  
-		while ($property = mysqli_fetch_field($result)) {
-		    echo '<td>' . $property->name . '</td>';  //get field name for header
-		    echo '<td>' . "action" . '</td>';
-		    array_push($all_property, $property->name);  //save those to array
-		}
-		echo '</tr>'; //end tr tag
-
-		//showing all data
-		while ($row = mysqli_fetch_array($result)) {
-		    echo "<tr>";
-		    foreach ($all_property as $item) {
-			echo '<td>' . $row[$item] . '</td>'; //get items using property value
-		    }
-		    echo '<td>' . '<input type="submit">' . '</td>';
-		    echo '</tr>';
-		}
-		echo "</table>";
-
-		?>
-	<form>
-
-		<input type="text" name="slist" value="new slave IP">
-		<input type="submit">
-	</form>
-
-
-	<h2>Add Master</h2>
-	<form>
-	<input type="text" name="wlist" >
+	
 	<input type="submit">
 	</form>
+      </article>
 
+      <article>
 	<h2>Restart Webserver</h2>
 	<form>
 	<input type="submit">
 	</form>
 
+      </article>
+      <article>
 	<h2>Restart Power Cycler</h2>
 	<form>
 	<input type="submit">
 	</form>
+      </article>
     </body>
   </article>
 </section>
