@@ -1,0 +1,33 @@
+Install Apache2
+  sudo apt-get install apache2 -y
+  Enter the address http://localhost
+Install PHP
+  sudo apt-get install php -y
+  sudo vi /var/www/index.php
+  put the content in the file --> <?php echo "hello world"; ?>
+  sudo rm -rf /var/www/index.html
+  Enter the address http://localhost
+Install MySQL
+  sudo apt-get install mysql-server php-mysql -y
+  sudo service apache2 restart
+Set up MySQL/MariaDB
+  sudo mysql_secure_installation
+  --> You will be asked Enter current password for root (enter for none): — press Enter.
+  --> Type in Y and press Enter to Set root password?.
+  --> Type in a password at the New password: prompt, and press Enter. Important: remember this root password, as you will need it later to set up WordPress.
+  --> Type in Y to Remove anonymous users.
+  --> Type in Y to Disallow root login remotely.
+  --> Type in Y to Remove test database and access to it.
+  --> Type in Y to Reload privilege tables now.
+  --> When complete, you will see the message All done! and Thanks for using MariaDB!
+Grant access to root user <creating a database user>
+  sudo mysql -u root -p
+To interact with MYSQL in Python
+  sudo apt-get install python-mysqldb
+To add a user in priviledge table for mysql
+  GRANT ALL PRIVILEGES ON 'dbname'.* TO 'username'@'localhost' IDENTIFIED BY 'password';
+Install phpmyadmin package
+  sudo apt-get install phpmyadmin
+Configuring Apache for phpMyAdmin
+  add the line "Include /etc/phpmyadmin/apache.conf " at the bottom of the file --> "sudo vi /etc/apache2/apache2.conf"
+Restart the apche server --> sudo service apache2 restart
