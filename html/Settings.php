@@ -154,44 +154,44 @@ $sec = "600";
 		echo '<td>' . "Number" . '</td>';  //get field name for header
 		echo '<td>' . "Name" . '</td>';  //get field name for header
 		echo '<td>' . "Locked" . '</td>';  //get field name for header
-		echo '<td>' . "Schedule1" . '</td>';  //get field name for header
-		echo '<td>' . "Schedule2" . '</td>';  //get field name for header
+		echo '<td>' . "Enable Schedule1" . '</td>';  //get field name for header
+		echo '<td>' . "Enable Schedule2" . '</td>';  //get field name for header
 		echo '<td>' . "Submit?" . '</td>';  //get field name for header
 	echo '</tr>'; //end tr tag
 	//showing all data
 	while ($row = mysqli_fetch_array($result)) {
 	?>
-	<form action="/action_page.php" method="get">
+	<form action="/Setting_switch.php" method="get">
 	<tr>
-		<td><?php echo $row["switchNo"]; ?></td>
-		<td><input type="text" name="Name" value="<?php echo $row["switchName"]; ?>" </td>
+		<td><input name="switchNo" id="switchNo" type="hidden" value="<?php echo $row["switchNo"];?>"><?php echo $row["switchNo"]; ?></td>
+		<td><input type="text" name="switchName" value="<?php echo $row["switchName"]; ?>" </td>
 		<td>
-			<select name="Locked">
-			<option>"<?php echo $row["isSwitchLocked"]; ?>"</option>
-			<option value="NO">"NO"</option>
-			<option value="YES">"YES"</option>
+			<select name="isSwitchLocked">
+			<option><?php echo $row["isSwitchLocked"]; ?></option>
+			<option value="NO">NO</option>
+			<option value="YES">YES</option>
 			</select>
 		</td>
 		<td>
-			<select name="Schedule1">
-			<option>"<?php echo $row["switchSchedule1Enable"]; ?>" </option>
-			<option value="NO">"NO"</option>
-			<option value="YES">"YES"</option>
+			<select name="switchSchedule1Enable">
+			<option><?php echo $row["switchSchedule1Enable"]; ?></option>
+			<option value="NO">NO</option>
+			<option value="YES">YES</option>
 			</select>
 		</td>
 		<td>
-			<select name="Schedule1">
-			<option>"<?php echo $row["switchSchedule2Enable"]; ?>" </option>
-			<option value="NO">"NO"</option>
-			<option value="YES">"YES"</option>
+			<select name="switchSchedule2Enable">
+			<option><?php echo $row["switchSchedule2Enable"]; ?></option>
+			<option value="NO">NO</option>
+			<option value="YES">YES</option>
 			</select>
 		</td>
-
 		<td>
 			<input type="submit">
 		</td>
-	</form>
+		<input type="hidden" name="divID" value="switches">
 	</tr>
+	</form>
 
 	<?php
 	}
@@ -203,18 +203,19 @@ $sec = "600";
       <article>
 	<h2>Power Cycler date and time</h2>
 	<form>
-		<input type="date" name="pday" min="2000-01-02">
-		<input type="time" name="pday">
+		<input type="datetime-local" name="pday" min="2000-01-02">
+		<input type="hidden" name="divID" value="datetime">
 		<input type="submit">
 	</form>
       </article>
 
       <article>
 	<h2>Network Selection</h2>
-	<form action="/action_page.php">
+	<form action="/Setting_switch.php">
 	  <select name="network" id="network">
 		<option value="DHCP">automatic</option>
 		<option value="MANUAL">manual</option>
+		<input type="hidden" name="divID" value="network">
 	  </select>
 
 	<div id="otherType" style="display:none;">
@@ -247,9 +248,8 @@ $sec = "600";
 
       <article>
 	<h2>Screening Type</h2>
-	<form action="/action.php">
 	  <select name="Screening" id="Screening">
-		<option value="SELECT">SELECT</option>
+		<option>SELECT</option>
 		<option value="WHITELIST">WHITELIST</option>
 		<option value="BLACKLIST">BLACKLIST</option>
 	  </select>
@@ -287,16 +287,24 @@ $sec = "600";
 
 		//showing all data
 		while ($row = mysqli_fetch_array($result)) {
-		    echo "<tr>";
+		?>
+		<form action="/Setting_switch.php">
+		<input type="hidden" name="divID" value="Wscreening">
+		<tr>
+		<?php
 		    foreach ($all_property as $item) {
-			echo '<td>' . $row[$item] . '</td>'; //get items using property value
+			echo '<td><input type name="IP" value=' .$row[$item] .'>' . $row[$item] . '</td>'; //get items using property value
+		        echo '<input type="hidden" name="WHITELIST" value="DELETE">';
+		    	echo '<td>' . '<input type="submit" value="DELETE">' ;
 		    }
-		    echo '<td>' . '<input type="submit">' . '</td>';
 		    echo '</tr>';
+		    echo "</form>";
 		}
+		echo '<form action="/Setting_switch.php">';
+		echo '<input type="hidden" name="divID" value="Wscreening">';
+		echo '<tr><td><input name="IP" type="text"></td><td><input type="hidden" name="WHITELIST" value="ADD"><input type="submit" value="ADD"></td></tr></form>';
 		echo "</table>";
 		?>
-
 	  </div>
 
 	  <div id="BLACKLIST" style="display:none;">
@@ -333,17 +341,24 @@ $sec = "600";
 
 		//showing all data
 		while ($row = mysqli_fetch_array($result)) {
-		    echo "<tr>";
-		    foreach ($all_property as $item) {
-			echo '<td>' . $row[$item] . '</td>'; //get items using property value
-		    }
-		    echo '<td>' . '<input type="submit">' . '</td>';
-		    echo '</tr>';
-		}
-		echo "</table>";
-
 		?>
-		
+		<form action="/Setting_switch.php">
+		<input type="hidden" name="divID" value="Bscreening">
+		<tr>
+		<?php	
+		    foreach ($all_property as $item) {
+			echo '<td><input name="IP" type="hidden" value=' . $row[$item] . '>' . $row[$item] . '</td>'; //get items using property value
+		    }
+		    echo '<td>' . '<input type="submit" value="DELETE">' . '</td>';
+		    echo '<input type="hidden" name="BLACKLIST" value="DELETE">';
+		    echo '</tr>';
+		    echo "</form>";
+		}
+		echo '<form action="/Setting_switch.php">';
+		echo '<input type="hidden" name="divID" value="Bscreening">';
+		echo '<tr><td><input name="IP" type="text"></td><td><input type="hidden" name="BLACKLIST" value="ADD"><input type="submit" value="ADD"></td></tr></form>';
+		echo "</table>";
+		?>
 	  </div>
   	  <script type="text/javascript"
 		src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -363,14 +378,13 @@ $sec = "600";
 		}
 	  });
 	  </script>
-	</form>
       </article>
 
       <article>
 	<h2>Operating Mode</h2>
 	<form action="/action.php">
 		<select name="OperationMode" id="OperationMode">
-			<option value="SELECT">SELECT</option>
+			<option>SELECT</option>
 			<option value="MASTER">MASTER</option>
 			<option value="SLAVE">SLAVE</option>
 		</select>

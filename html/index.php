@@ -140,7 +140,7 @@ $sec = "10";
 	}
 
 	//get results from database
-	$result = mysqli_query($connection,"SELECT switchNo,switchName,switchState,isSwitchLocked,switchActionTime FROM pc_db");
+	$result = mysqli_query($connection,"SELECT switchNo,switchName,switchState,isSwitchLocked,changedByIP,switchActionTime FROM pc_db");
 	$all_property = array();  //declare an array for saving property
 
 	//showing property
@@ -151,6 +151,7 @@ $sec = "10";
 		echo '<td>' . "Name" . '</td>';  //get field name for header
 		echo '<td>' . "State" . '</td>';  //get field name for header
 		echo '<td>' . "Locked" . '</td>';  //get field name for header
+		echo '<td>' . "Last Changed By" . '</td>';  //get field name for header
 		echo '<td>' . "Last Updated" . '</td>';  //get field name for header
 	while ($property = mysqli_fetch_field($result)) {
 	    //echo '<td>' . $property->name . '</td>';  //get field name for header
